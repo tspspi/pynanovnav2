@@ -1,17 +1,21 @@
+import sys
+sys.path.append("../")
+
+
 import serial
 import atexit
 import struct
 
 from time import sleep
 # from labdevices import vectornetworkanalyzer
-from vectornetworkanalyzer import VectorNetworkAnalyzer
+# from vectornetworkanalyzer import VectorNetworkAnalyzer
+from pynanovnav2 import vectornetworkanalyzer
 
 from labdevices.exceptions import CommunicationError_ProtocolViolation
 from labdevices.exceptions import CommunicationError_Timeout
 from labdevices.exceptions import CommunicationError_NotConnected
 
-# vectornetworkanalyzer.VectorNetworkAnalyzer
-class NanoVNAV2(VectorNetworkAnalyzer):
+class NanoVNAV2(vectornetworkanalyzer.VectorNetworkAnalyzer):
 	def __init__(
 		self,
 		port,
@@ -27,7 +31,7 @@ class NanoVNAV2(VectorNetworkAnalyzer):
 		self._use_numpy = useNumpy
 
 		self._debug = debug
-		self._discard_first_point = True
+		self._discard_first_point = False
 
 		self._regs = {
 			0x00 : { 'mnemonic' : "sweepStartHz"      , 'regbytes' : 8   , 'fifobytes': None, 'desc' : "Sweep start frequency in Hz"                            , "enable" : True  },
@@ -217,16 +221,16 @@ class NanoVNAV2(VectorNetworkAnalyzer):
 		#   101 samples (100 + discarded first point)
 		#   1 value per frequency
 		self._reg_write(0x00, int(500e6)-4)
-		self._reg_write(0x10, int(4))
+		self._reg_write(0x10, int(35))
 		self._reg_write(0x20, 101)
 		self._reg_write(0x22, 1)
 
 		if self._use_numpy:
 			import numpy as np
 			if self._discard_first_point:
-				self._frequencies = np.linspace(500e6 - 4, 500e6 + 101 * 4, 101+1)
+				self._frequencies = np.linspace(500e6 - 35, 500e6 + 101 * 35, 101+1)
 			else:
-				self._frequencies = np.linspace(500e6 - 4, 500e6 + 101 * 4, 101)
+				self._frequencies = np.linspace(500e6, 500e6 + 101 * 35, 101)
 		else:
 			self._frequencies = []
 			if self._discard_first_point:
@@ -234,7 +238,7 @@ class NanoVNAV2(VectorNetworkAnalyzer):
 					self._frequencies.append(500e6 - 4 + i * 4)
 			else:
 				for i in range(101):
-					self._frequencies.append(500e6 - 4 + i * 4)
+					self._frequencies.append(500e6 + i * 4)
 
 		# Load current state from registers ...
 		self._sweepStartHz = self._reg_read(0x00)
@@ -477,6 +481,14 @@ class NanoVNAV2(VectorNetworkAnalyzer):
 			# Setting failed ...
 			return False
 
+		if self._use_numpy:
+			import numpy as np
+			self._frequencies = np.linspace(read_sweepStartHz, read_sweepStartHz + read_sweepPoints * read_sweepStepHz, read_sweepPoints)
+		else:
+			self._frequencies = []
+			for i in range(read_sweepPoints):
+				self._frequencies.append(read_sweepStartHz + i * read_sweepStepHz)
+
 		self._valuesPerFrequency = read_valuesPerFrequency
 		self._sweepStepHz = read_sweepStepHz
 		self._sweepPoints = read_sweepPoints
@@ -490,7 +502,8 @@ if __name__ == "__main__":
 	with NanoVNAV2("/dev/ttyU0", debug = True, useNumpy = True) as vna:
 		print(f"Indicate returns {vna._op_indicate()}")
 		print(f"ID returned {vna._get_id()}")
-		vna._set_sweep_start_size_n(500e6, 1e6, 101)
+		#vna._set_sweep_start_size_n(500e6, 1e6, 101)
+		vna._set_sweep_start_size_n(500e6, 1e3, 101)
 		trace = vna._query_trace()
 
 		import numpy as np
@@ -513,7 +526,7 @@ if __name__ == "__main__":
 		ax[1][0].grid()
 		ax[1][0].legend()
 
-		ax[1][1].set_title("Transmitted (s01)")
+		ax[1][1].set_title("S00, S01 (raw)")
 		ax[1][1].plot(trace["freq"], np.real(trace["rev1"]), label = "I S01")
 		ax[1][1].plot(trace["freq"], np.imag(trace["rev1"]), label = "Q S01")
 		ax[1][1].plot(trace["freq"], np.real(trace["rev0"]), label = "I S00")
