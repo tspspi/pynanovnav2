@@ -335,6 +335,8 @@ class NanoVNAV2(vectornetworkanalyzer.VectorNetworkAnalyzer):
 		nPointsToRead = self._valuesPerFrequency * self._sweepPoints
 		nDataPoints = nPointsToRead
 
+		print(f"Points to read: {nPointsToRead}")
+
 		# Read in batches of <= 255 samples ...
 		while nPointsToRead > 0:
 			batchPoints = min(nPointsToRead, 255)
@@ -356,6 +358,8 @@ class NanoVNAV2(vectornetworkanalyzer.VectorNetworkAnalyzer):
 				nBytesRead = nBytesRead + len(datanew)
 
 			nPointsToRead = nPointsToRead - batchPoints
+
+		print(f"Read data: {len(alldata)}")
 
 		# Decode all datapoints
 
@@ -513,20 +517,30 @@ if __name__ == "__main__":
 		print(f"Indicate returns {vna._op_indicate()}")
 		print(f"ID returned {vna._get_id()}")
 		#vna._set_sweep_start_size_n(500e6, 1e6, 101)
-		vna._set_sweep_start_size_n(500e6, 1e3, 101)
+		# vna._set_sweep_start_size_n(500e6, 1e3, 101)
+		vna._set_sweep_start_size_n(500e6, 1e3, 301)
 		trace = vna._query_trace()
+
+		print(trace)
+		print(f"Lengths:")
+		print(f"\tFreq: {len(trace['freq'])}")
+		print(f"\tS21 raw: {len(trace['s21raw'])}")
+		print(f"\tS11 raw: {len(trace['s11raw'])}")
+		print(f"\tfwd0: {len(trace['fwd0'])}")
+		print(f"\trev0: {len(trace['rev0'])}")
+		print(f"\trev1: {len(trace['rev1'])}")
 
 		import numpy as np
 		import matplotlib.pyplot as plt
 		fig, ax = plt.subplots(2, 2, figsize=(6.4*2, 4.8*2))
 		ax[0][0].set_title("Magnitude")
-		ax[0][0].plot(trace["freq"], np.absolute(trace["s01raw"]), label = "S01")
-		ax[0][0].plot(trace["freq"], np.absolute(trace["s00raw"]), label = "S00")
+		ax[0][0].plot(trace["freq"], np.absolute(trace["s21raw"]), label = "S21")
+		ax[0][0].plot(trace["freq"], np.absolute(trace["s11raw"]), label = "S11")
 		ax[0][0].grid()
 		ax[0][0].legend()
 		ax[0][1].set_title("Phase")
-		ax[0][1].plot(trace["freq"], np.angle(trace["s01raw"]), label = "S01")
-		ax[0][1].plot(trace["freq"], np.angle(trace["s00raw"]), label = "S00")
+		ax[0][1].plot(trace["freq"], np.angle(trace["s21raw"]), label = "S21")
+		ax[0][1].plot(trace["freq"], np.angle(trace["s11raw"]), label = "S11")
 		ax[0][1].grid()
 		ax[0][1].legend()
 
@@ -536,11 +550,11 @@ if __name__ == "__main__":
 		ax[1][0].grid()
 		ax[1][0].legend()
 
-		ax[1][1].set_title("S00, S01 (raw)")
-		ax[1][1].plot(trace["freq"], np.real(trace["rev1"]), label = "I S01")
-		ax[1][1].plot(trace["freq"], np.imag(trace["rev1"]), label = "Q S01")
-		ax[1][1].plot(trace["freq"], np.real(trace["rev0"]), label = "I S00")
-		ax[1][1].plot(trace["freq"], np.imag(trace["rev0"]), label = "Q S00")
+		ax[1][1].set_title("S11, S21 (raw)")
+		ax[1][1].plot(trace["freq"], np.real(trace["rev1"]), label = "I S21")
+		ax[1][1].plot(trace["freq"], np.imag(trace["rev1"]), label = "Q S21")
+		ax[1][1].plot(trace["freq"], np.real(trace["rev0"]), label = "I S11")
+		ax[1][1].plot(trace["freq"], np.imag(trace["rev0"]), label = "Q S11")
 		ax[1][1].grid()
 		ax[1][1].legend()
 		plt.show()
