@@ -23,7 +23,17 @@ class NanoVNAV2(vectornetworkanalyzer.VectorNetworkAnalyzer):
 		debug = False,
 		useNumpy = False
 	):
-		super().__init__()
+		super().__init__(
+			frequencyMinimum = float(50e3),
+			frequencyMaximum = float(4400e6),
+			frequencyStepMin = float(10e3),
+			frequencyStepMax = float(4400e6 - 50e3),
+			datapointsMin = 101,
+			datapointsMax = 1023,
+			#datapointsDiscrete = ( 101, 11, 51, 201, 301, 501, 1021 ),
+			datapointsDiscrete = ( 101, 11, 51, 301 ),
+			datapointsPerFrequency = 1
+		)
 
 		if useNumpy:
 			import numpy as np
@@ -369,8 +379,8 @@ class NanoVNAV2(vectornetworkanalyzer.VectorNetworkAnalyzer):
 				"rev0" : [],
 				"rev1" : [],
 
-				"s00raw" : [],
-				"s01raw" : []
+				"s11raw" : [],
+				"s21raw" : []
 			}
 			for _ in range(nDataPoints):
 				pkgdata["freq"].append(0.0)
@@ -379,8 +389,8 @@ class NanoVNAV2(vectornetworkanalyzer.VectorNetworkAnalyzer):
 				pkgdata["rev0"].append(0.0)
 				pkgdata["rev1"].append(0.0)
 
-				pkgdata["s00raw"].append(0.0)
-				pkgdata["s01raw"].append(0.0)
+				pkgdata["s11raw"].append(0.0)
+				pkgdata["s21raw"].append(0.0)
 
 		if self._discard_first_point:
 			nDataPoints = nDataPoints - 1
@@ -403,15 +413,15 @@ class NanoVNAV2(vectornetworkanalyzer.VectorNetworkAnalyzer):
 				pkgdata["rev0"][freqIndex] = rev0Re + 1j*rev0Im
 				pkgdata["rev1"][freqIndex] = rev1Re + 1j*rev1Im
 
-			# Recover (raw, uncalibrated) S00 and S01 by performing phase and amplitude
+			# Recover (raw, uncalibrated) S11 and S21 by performing phase and amplitude
 			# correction of reflected and transmitted signal (normalize by output signal)
 
 			if not self._use_numpy:
-				pkgdata["s00raw"][freqIndex] = self.__complex_divide( (rev0Re, rev0Im), (fwd0Re, fwd0Im) )
-				pkgdata["s01raw"][freqIndex] = self.__complex_divide( (rev1Re, rev1Im), (fwd0Re, fwd0Im) )
+				pkgdata["s11raw"][freqIndex] = self.__complex_divide( (rev0Re, rev0Im), (fwd0Re, fwd0Im) )
+				pkgdata["s21raw"][freqIndex] = self.__complex_divide( (rev1Re, rev1Im), (fwd0Re, fwd0Im) )
 			else:
-				pkgdata["s00raw"] = pkgdata["rev0"] / pkgdata["fwd0"]
-				pkgdata["s01raw"] = pkgdata["rev1"] / pkgdata["fwd0"]
+				pkgdata["s11raw"] = pkgdata["rev0"] / pkgdata["fwd0"]
+				pkgdata["s21raw"] = pkgdata["rev1"] / pkgdata["fwd0"]
 
 		return pkgdata
 	# Internal methods
