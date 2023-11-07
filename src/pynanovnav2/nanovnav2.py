@@ -17,6 +17,24 @@ from labdevices.exceptions import CommunicationError_ProtocolViolation
 from labdevices.exceptions import CommunicationError_Timeout
 from labdevices.exceptions import CommunicationError_NotConnected
 
+# Spectrum analyzer wrapper class
+#
+# This uses the NanoVNA V2 only on port2 (since the tracking generator
+# is not disable-able). It's assumed that port1 is termianted with 50 Ohms
+
+class NanoVNAV2SpectrumAnalyzerPort2:
+    def __init__(
+        self,
+        port,
+
+        logger = None,
+        debug = False,
+        useNumpy = False,
+        loglevel = logging.ERROR
+    ):
+        self._vna = NanoVNAV2(port, logger, debug, useNumpy, loglevel)
+
+
 class NanoVNAV2(vectornetworkanalyzer.VectorNetworkAnalyzer):
     def __init__(
         self,
