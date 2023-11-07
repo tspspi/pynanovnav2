@@ -2,7 +2,16 @@ import atexit
 
 class VectorNetworkAnalyzer:
 	def __init__(
-		self
+		self,
+
+		frequencyMinimum = None,
+		frequencyMaximum = None,
+		frequencyStepMin = None,
+		frequencyStepMax = None,
+		datapointsMin = None,
+		datapointsMax = None,
+		datapointsDiscrete = None,
+		datapointsPerFrequency = None
 	):
 		self._usesContext = False
 		self._usedConnect = False

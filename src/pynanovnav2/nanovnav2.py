@@ -27,7 +27,16 @@ class NanoVNAV2(vectornetworkanalyzer.VectorNetworkAnalyzer):
         useNumpy = False,
         loglevel = logging.ERROR
     ):
-        super().__init__()
+        super().__init__(
+            frequencyMinimum = float(50e3),
+            frequencyMaximum = float(4400e6),
+            frequencyStepMin = float(10e3),
+            frequencyStepMax = float(4400e6-50e3),
+            datapointsMin = 101,
+            datapointsMax = 1024,
+            datapointsDiscrete = (101, 11, 51, 301),
+            datapointsPerFrequency = 1
+        )
 
         if useNumpy:
             import numpy as np
