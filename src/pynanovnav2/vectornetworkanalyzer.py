@@ -1,30 +1,39 @@
 import atexit
 
+from enum import Enum
+
+class VectorNetworkAnalyzer_AverageMode(Enum):
+    POINT_BY_POINT = 1
+    SWEEP_BY_SWEEP = 2
+
 class VectorNetworkAnalyzer:
-	def __init__(
-		self,
+    def __init__(
+        self,
 
-		frequencyMinimum = None,
-		frequencyMaximum = None,
-		frequencyStepMin = None,
-		frequencyStepMax = None,
-		datapointsMin = None,
-		datapointsMax = None,
-		datapointsDiscrete = None,
-		datapointsPerFrequency = None
-	):
-		self._usesContext = False
-		self._usedConnect = False
+        frequencyRange = ( None, None ),
 
-	# Overridden methods:
+        frequencyStepRange = ( None, None ),
+        frequencyStepDiscrete = None,
 
-	def _get_id(self):
-		raise NotImplementedException("Method not implemented by device")
-	def _set_sweep_start_stop_n(self, start, stop, nsamps):
-		raise NotImplementedException("Method not implemented by device")
-	def _set_sweep_start_size_n(self, start, stepsize, nsamps):
-		raise NotImplementedException("Method not implemented by device")
-	def _set_samples_per_point(self, nsamples):
-		raise NotImplementedException("Method not implemented by device")
-	def _query_trace(self):
-		raise NotImplementedException("Method not implemented by device")
+        attenuatorRange = ( None, None ),
+        attenuatorDiscrete = None,
+        preampRange = ( None, None ),
+        preampDiscrete = None,
+
+        trackingGeneratorAmplitude = ( None, None )
+    ):
+        self._usesContext = False
+        self._usedConnect = False
+
+    # Overridden methods:
+
+    def _get_id(self):
+        raise NotImplementedException("Method not implemented by device")
+    def _set_sweep_range(self, start, stop, step = None):
+        raise NotImplementedException("Method not implemented by device")
+    def _query_trace(self):
+        raise NotImplementedException("Method not implemented by device")
+    def _set_average(self, naverages, averageMode = VectorNetworkAnalyzer_AverageMode.POINT_BY_POINT):
+        raise NotImplementedException("Method not implemented by device")
+
+    # Exposed methods ...

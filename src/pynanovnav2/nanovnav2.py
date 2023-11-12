@@ -46,14 +46,11 @@ class NanoVNAV2(vectornetworkanalyzer.VectorNetworkAnalyzer):
         loglevel = logging.ERROR
     ):
         super().__init__(
-            frequencyMinimum = float(50e3),
-            frequencyMaximum = float(4400e6),
-            frequencyStepMin = float(10e3),
-            frequencyStepMax = float(4400e6-50e3),
-            datapointsMin = 101,
-            datapointsMax = 1024,
-            datapointsDiscrete = (101, 11, 51, 301),
-            datapointsPerFrequency = 1
+            frequencyRange = ( 50e3, 4400e6 ),
+            frequencyStepRange = ( 50e3, 10e6 ),
+            attenuatorRange = ( 0, 0 ),
+            preampRange = ( 0, 0 ),
+            trackingGeneratorAmplitude = ( -7, -7 )
         )
 
         if useNumpy:
@@ -564,19 +561,26 @@ if __name__ == "__main__":
         import numpy as np
         import matplotlib.pyplot as plt
 
-        vna._set_sweep_range(100e6, 1e9, 10e6)
+        vna._set_sweep_range(100e6, 500e6, 50e3)
         data = vna._query_trace()
 
         fig, ax = plt.subplots(2, figsize=(6.4*2, 4.8*4))
-        ax[0].plot(data["freq"], data["s00rawdbm"], label = "S00")
-        ax[0].plot(data["freq"], data["s01rawdbm"], label = "S01")
+        ax[0].plot(data["freq"]/1e6, data["s00rawdbm"], label = "S00")
+        ax[0].plot(data["freq"]/1e6, data["s01rawdbm"], label = "S01")
+        ax[0].set_xlabel("Frequency [MHz]")
+        ax[0].set_ylabel("Power [dB]")
+        #ax[0].set_title("S00 of microcoil on outside flange")
         ax[0].grid()
         ax[0].legend()
 
-        ax[1].plot(data["freq"], data["s00rawphase"], label = "Phase S00")
-        ax[1].plot(data["freq"], data["s01rawphase"], label = "Phase S01")
+        ax[1].plot(data["freq"]/1e6, data["s00rawphase"], label = "Phase S00")
+        ax[1].plot(data["freq"]/1e6, data["s01rawphase"], label = "Phase S01")
+        ax[1].set_xlabel("Frequency [MHz]")
+        ax[1].set_ylabel("Phase [rad]")
         ax[1].grid()
         ax[1].legend()
+
+        np.savez("data.npz", **data)
 
         plt.show()
 
