@@ -47,7 +47,7 @@ class NanoVNAV2(vectornetworkanalyzer.VectorNetworkAnalyzer):
     ):
         super().__init__(
             frequencyRange = ( 50e3, 4400e6 ),
-            frequencyStepRange = ( 50e3, 10e6 ),
+            frequencyStepRange = ( 1e3, 10e6 ),
             attenuatorRange = ( 0, 0 ),
             preampRange = ( 0, 0 ),
             trackingGeneratorAmplitude = ( -7, -7 )
@@ -337,8 +337,8 @@ class NanoVNAV2(vectornetworkanalyzer.VectorNetworkAnalyzer):
             raise ValueError("Stop frequency has to be above start frequency")
         if float(start) > 3e9:
             raise ValueError("Stop frequency has to be below 3 GHz")
-        if int(step) < 50e3:
-            raise ValueError("Step size has to be 50 kHz or larger")
+        if int(step) < 1e3:
+            raise ValueError("Step size has to be 1 kHz or larger")
 
         nPointsTotal = int(int((stop - start) / int(step)))
         nSegments = int(nPointsTotal / wndPoints)
