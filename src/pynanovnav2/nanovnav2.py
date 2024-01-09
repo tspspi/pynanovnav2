@@ -393,14 +393,14 @@ class NanoVNAV2(vectornetworkanalyzer.VectorNetworkAnalyzer):
         if self._use_numpy:
             import numpy as np
             pkgdata = {
-                "freq" : np.full((self._sweepPoints * self._sweepSegments), np.nan),
+                "freq" : np.asarray([]), # np.full((self._sweepPoints * self._sweepSegments), np.nan),
 
-                "fwd0" : np.full((self._sweepPoints * self._sweepSegments), np.nan, dtype = complex),
-                "rev0" : np.full((self._sweepPoints * self._sweepSegments), np.nan, dtype = complex),
-                "rev1" : np.full((self._sweepPoints * self._sweepSegments), np.nan, dtype = complex),
+                "fwd0" : np.asarray([]), # np.full((self._sweepPoints * self._sweepSegments), np.nan, dtype = complex),
+                "rev0" : np.asarray([]), # np.full((self._sweepPoints * self._sweepSegments), np.nan, dtype = complex),
+                "rev1" : np.asarray([]), # np.full((self._sweepPoints * self._sweepSegments), np.nan, dtype = complex),
 
-                "s00raw" : np.full((self._sweepPoints * self._sweepSegments), np.nan, dtype = complex),
-                "s01raw" : np.full((self._sweepPoints * self._sweepSegments), np.nan, dtype = complex)
+                "s00raw" : np.asarray([]), # np.full((self._sweepPoints * self._sweepSegments), np.nan, dtype = complex),
+                "s01raw" : np.asarray([])  # np.full((self._sweepPoints * self._sweepSegments), np.nan, dtype = complex)
             }
         else:
             pkgdata = {
