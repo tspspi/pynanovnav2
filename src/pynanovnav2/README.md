@@ -1,7 +1,11 @@
 # Unofficial NanoVNA v2 USB Python library and tools
 
+__This library is work in progress__
+
 This is a small library that allows to access the NanoVNA v2 vector network
-analyzer using Python.
+analyzer using Python. It implements the ```VectorNetworkAnalyzer```
+base class of [pylabdevs](https://github.com/tspspi/pylabdevs) (since this
+is work in progress there is currently an unfinished copy in this repository).
 
 ## Tools
 
