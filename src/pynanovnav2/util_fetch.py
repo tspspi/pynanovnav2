@@ -40,7 +40,7 @@ def main():
         print(f"Start frequency {args.start} or end frequency {args.end} is out of supported range from 50 MHz to 4.4 GHz")
         sys.exit(1)
     if (args.start >= args.end):
-        print(f"Start frequency has to be smaller than end frequency")
+        print("Start frequency has to be smaller than end frequency")
         sys.exit(1)
     if (args.step < 1e3) or (args.step > 10e6):
         print("Step size has to be in range of 1 kHz to 10 MHz")
@@ -56,7 +56,7 @@ def main():
         print(f"Plotting: {plotting}")
 
     if not args.s00 and not args.s01:
-        print(f"You have to select at least --s00 or --s01")
+        print("You have to select at least --s00 or --s01")
         sys.exit(1)
 
     if plotting:
@@ -68,7 +68,7 @@ def main():
             print(f"NanoVNA v2 identified as {_id}")
 
         if args.debug:
-            print(f"Setting:")
+            print( "Setting:")
             print(f"\tStart frequency {args.start}")
             print(f"\tEnd frequency   {args.end}")
             print(f"\tStep size       {args.step}")

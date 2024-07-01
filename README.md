@@ -13,8 +13,10 @@ is work in progress there is currently an unfinished copy in this repository).
 
 The ```nanovnav2fetch``` is a very simple command line utility that
 allows one to fetch the S00 and S01 parameters as well as phases
-from the NanoVNA v2. Note that this utility always depends on ```numpy```
-and requires ```matplotlib``` to plot or show the traces.
+from the NanoVNA v2. Note that this utility always depends on ```numpy``` (>= 1.25)
+and requires ```matplotlib``` (>= 3.8.0) to plot or show the traces.
+Those dependencies are not contained in ```setup.cfg``` since the remaining
+library is not depending on these.
 
 ```
 $ nanovnav2fetch --help

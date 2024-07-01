@@ -8,7 +8,6 @@ import math
 
 import logging
 
-from time import sleep
 # from labdevices import vectornetworkanalyzer
 # from vectornetworkanalyzer import VectorNetworkAnalyzer
 from pynanovnav2 import vectornetworkanalyzer
@@ -53,8 +52,8 @@ class NanoVNAV2(vectornetworkanalyzer.VectorNetworkAnalyzer):
             trackingGeneratorAmplitude = ( -7, -7 )
         )
 
-        if useNumpy:
-            import numpy as np
+#        if useNumpy:
+#            import numpy as np
 
         if logger is not None:
             self._logger = logger
@@ -285,7 +284,7 @@ class NanoVNAV2(vectornetworkanalyzer.VectorNetworkAnalyzer):
         self._hardwareRevision = self._reg_read(0xF2)
         self._firmwareVersion = ( self._reg_read(0xF3), self._reg_read(0xF4) )
         if False:
-            print(f"Initial settings:")
+            print( "Initial settings:")
             print(f"\tSweep start frequency: {self._sweepStartHz}")
             print(f"\tSweep step frequency:  {self._sweepStepHz}")
             print(f"\tSweep points:          {self._sweepPoints}")
@@ -387,7 +386,7 @@ class NanoVNAV2(vectornetworkanalyzer.VectorNetworkAnalyzer):
             raise CommunicationError_NotConnected("Device it not connected, failed to query data")
 
         currentStart = self._sweepStartHz
-        currentValuesPerFreq = self._valuesPerFrequency
+#        currentValuesPerFreq = self._valuesPerFrequency
         freqBaseIndex = 0
 
         if self._use_numpy:
@@ -425,10 +424,10 @@ class NanoVNAV2(vectornetworkanalyzer.VectorNetworkAnalyzer):
 
         for iSegment in range(self._sweepSegments):
             if False:
-                print(f"Sweep segment:")
+                print( "Sweep segment:")
                 print(f"\tStart: {currentStart}")
                 print(f"\tStep:  {self._sweepStepHz}")
-                print(f"\tPoints:101")
+                print( "\tPoints:101")
                 print(f"\tAvg:   {self._valuesPerFrequency}")
             # Set parameters for sweep
             realSweepPoints = self._sweepPoints
@@ -561,15 +560,76 @@ if __name__ == "__main__":
         import numpy as np
         import matplotlib.pyplot as plt
 
-        vna._set_sweep_range(100e6, 500e6, 50e3)
+#        from ssg3021x.ssg3021x import SSG3021X
+#        with SSG3021X("10.4.1.11") as ssg:
+#            print(f"ID of SSG returned {ssg._id()}")
+#
+#            plots = {}
+#
+#            for fmhz in [ 202e6, 400e6 ]:
+#
+#                dbmout, dbmin, dbmexp = [], [], []
+#
+#                ssg._set_channel_frequency(0, fmhz)
+#                for dbm in np.linspace(-30, 10, 80):
+#                    ssg._set_channel_amplitude(0, dbm)
+#                    dbmout.append(dbm)
+#                    dbmexp.append(dbm-11)
+#
+#                    print(f"{fmhz} MHz, Power {dbm}")
+#
+#                    vna._set_sweep_range(fmhz-50e3, fmhz+50e3, 1e3)
+#                    data = vna._query_trace()
+#
+#                    maxdbm, maxdbmi = np.max(data["s01rawdbm"]), np.argmax(data["s01rawdbm"])
+#                    dbmin.append(maxdbm)
+#
+#                    fig, ax = plt.subplots(figsize=(6.4*2, 4.8*2))
+#                    ax.plot(data["freq"]/1e6, data["s01rawdbm"], label = f"Port 1 (Max power: {maxdbm} dB)")
+#                    ax.grid()
+#                    ax.legend()
+#                    ax.set_xlabel("Frequency [MHz]")
+#                    ax.set_ylabel("Power [dB]")
+#                    plt.savefig(f"{fmhz}mhz_{dbm}dbm.png")
+#                    #plt.show()
+#                    np.savez(f"{fmhz}mhz_{dbm}dbm.npz", **data)
+#                    plt.close('all')
+#
+#                plots[fmhz] = ( dbmout, dbmexp, dbmin )
+
+#        fig, ax = plt.subplots(2)
+#        ax[0].set_xlabel("Power output")
+#        ax[0].set_ylabel("Power measured")
+#        ax[1].set_xlabel("Power expected")
+#        ax[1].set_ylabel("Power measured")
+#        for hz in plots:
+#            ax[0].plot(plots[hz][0], plots[hz][2], label = f"{hz/1e6} MHz")
+#            ax[1].plot(plots[hz][1], plots[hz][2], label = f"{hz/1e6} MHz")
+#            np.savez("amplifier{hz}.npz", dbmout = np.asarray(plots[hz][0]), dbmexp = np.asarray(plots[hz][1]), dbmin = np.asarray(plots[hz][2]))
+#        ax[0].grid()
+#        ax[1].grid()
+#        ax[0].legend()
+#        ax[1].legend()
+#        plt.savefig("amplifier.png")
+#        plt.savefig("amplifier.svg")
+#        plt.show()
+
+#        import sys
+#        sys.exit(0)
+
+
+
+        #centerfreq = 208e6
+        #vna._set_sweep_range(centerfreq-50e6, centerfreq+50e6, 5e3)
+        vna._set_sweep_range(50e6, 500e6, 5e3) #5e3
         data = vna._query_trace()
 
-        fig, ax = plt.subplots(2, figsize=(6.4*2, 4.8*4))
+        fig, ax = plt.subplots(2, figsize=(6.4*1, 4.8*2))
         ax[0].plot(data["freq"]/1e6, data["s00rawdbm"], label = "S00")
         ax[0].plot(data["freq"]/1e6, data["s01rawdbm"], label = "S01")
         ax[0].set_xlabel("Frequency [MHz]")
         ax[0].set_ylabel("Power [dB]")
-        #ax[0].set_title("S00 of microcoil on outside flange")
+        ax[0].set_title("Kicker")
         ax[0].grid()
         ax[0].legend()
 
@@ -582,78 +642,7 @@ if __name__ == "__main__":
 
         np.savez("data.npz", **data)
 
+        plt.savefig("data.png")
+        plt.savefig("data.svg")
         plt.show()
 
-if __name__ == "__main__OLD":
-    with NanoVNAV2("/dev/ttyU0", debug = True, useNumpy = True) as vna:
-        print(f"Indicate returns {vna._op_indicate()}")
-        print(f"ID returned {vna._get_id()}")
-        #vna._set_sweep_start_size_n(500e6, 1e6, 101)
-        #vna._set_sweep_start_size_n(500e6, 1e3, 101)
-        #vna._set_sweep_start_size_n(100e6, 1e3, )
-
-        import numpy as np
-        import matplotlib.pyplot as plt 
-
-        start = int(100e6)
-        frqs = []
-        s01, s00 = [], []
-        step = 50e3
-        
-        while(start < 500e6):
-            print(f"{start} ... ")
-            vna._set_sweep_start_size_n(start, step, 101)
-            trace = vna._query_trace()
-            start = start + int(101*step)
-
-            frqs.append(trace["freq"])
-            s01.append(np.absolute(trace["s01raw"]))
-            s00.append(np.absolute(trace["s00raw"]))
-
-        frqs = np.concatenate(frqs)
-        s00 = np.concatenate(s00)
-        s01 = np.concatenate(s01)
-
-        fig, ax = plt.subplots(figsize=(6.4, 4.8))
-        ax.plot(frqs / 1e6, s00, label = "S00")
-        ax.plot(frqs / 1e6, s01, label = "S01")
-        ax.grid()
-        ax.legend()
-        ax.set_xlabel("Frequency [MHz]")
-        ax.set_ylabel("Power")
-        plt.show()
-
-        np.savez("data.npz", frqs = frqs, s00 = s00, s01 = s01)
-
-        if False:
-            trace = vna._query_trace()
-
-            import numpy as np
-            import matplotlib.pyplot as plt
-            fig, ax = plt.subplots(2, 2, figsize=(6.4*2, 4.8*2))
-            ax[0][0].set_title("Magnitude")
-            ax[0][0].plot(trace["freq"], np.absolute(trace["s01raw"]), label = "S01")
-            ax[0][0].plot(trace["freq"], np.absolute(trace["s00raw"]), label = "S00")
-            ax[0][0].grid()
-            ax[0][0].legend()
-            ax[0][1].set_title("Phase")
-            ax[0][1].plot(trace["freq"], np.angle(trace["s01raw"]), label = "S01")
-            ax[0][1].plot(trace["freq"], np.angle(trace["s00raw"]), label = "S00")
-            ax[0][1].grid()
-            ax[0][1].legend()
-
-            ax[1][0].set_title("Transmitted (fwd)")
-            ax[1][0].plot(trace["freq"], np.real(trace["fwd0"]), label = "I")
-            ax[1][0].plot(trace["freq"], np.imag(trace["fwd0"]), label = "Q")
-            ax[1][0].grid()
-            ax[1][0].legend()
-
-            ax[1][1].set_title("S00, S01 (raw)")
-            ax[1][1].plot(trace["freq"], np.real(trace["rev1"]), label = "I S01")
-            ax[1][1].plot(trace["freq"], np.imag(trace["rev1"]), label = "Q S01")
-            ax[1][1].plot(trace["freq"], np.real(trace["rev0"]), label = "I S00")
-            ax[1][1].plot(trace["freq"], np.imag(trace["rev0"]), label = "Q S00")
-            ax[1][1].grid()
-            ax[1][1].legend()
-            plt.show()
-            pass
